@@ -1,5 +1,5 @@
 clear, clc, close;
-numRun = 1;
+numRun = 10;
 for l=1:numRun
 
    Problem = {'ecoli', 'sick_euthyroid', 'yeast_me2', 'arrhythmia', 'yeast_ml8'}; 
@@ -39,7 +39,7 @@ for l=1:numRun
        %% basic settings of ACO algorithm
         num = 5;
         opts.N  = 100;     % number of solutions 100
-        opts.T  = 5%0;    % maximum number of iterations
+        opts.T  = 50;    % maximum number of iterations
         opts.num = num; 
         
        %% Feature selection in each cluster by ACO algorithm
