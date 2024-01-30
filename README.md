@@ -2,7 +2,7 @@
 Code for “Evolving Pathway Activation from Cancer Gene Expression Data using Nature-inspired Ensemble Optimization”
 
 ## Framework
-![model](https://github.com/wangxb96/HSNOE/figures/model.png)
+![model](https://github.com/wangxb96/HSNOE/blob/main/figures/model.png)
 
 ## Folders
 - **ComparisonMethods**: The baselines for comparison, including nature-inspired methods and machine learning methods.
