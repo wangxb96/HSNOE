@@ -1,9 +1,8 @@
 clear, clc, close;
 numRun = 5;
 for l=1:numRun
-    % Problem = {'grammatical_facial_expression01','Chen-2002','Chowdary-2006','BASEHOCK','gisette','PCMAC', 'RELATHE'}; 
     Problem = {'thyroid_sick'};
-    % Problem = {'arrhythmia', 'ecoli', 'isolet', 'protein_homo', 'sick_euthyroid', 'yeast_me2', 'yeast_ml8'};
+
     %% MAIN LOOP
     for j = 1:length(Problem)
         p_name = Problem{j};                          
