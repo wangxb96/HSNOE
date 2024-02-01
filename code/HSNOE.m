@@ -2,14 +2,15 @@ clear, clc, close;
 numRun = 10;
 for l=1:numRun
 
-   Problem = {'ecoli', 'sick_euthyroid', 'yeast_me2', 'arrhythmia', 'yeast_ml8'}; 
+   Problem = {'ecoli'};
 
     %% MAIN LOOP
     for j = 1:length(Problem)
         p_name = Problem{j};
         results.p_name = p_name;                           
         warning('off','all');
-        traindata = load(['C:\Users\wangxb\Desktop\HSNOE\data\',p_name]); %s2302
+        %% load data
+        traindata = load(['C:\Users\wangxb\Desktop\HSNOE\data\,p_name]);
 
         Data = traindata.data;
         feat = Data(:,1:end-1); 
@@ -22,12 +23,12 @@ for l=1:numRun
         % Data =data;
         cv = cvpartition(Data(:,end), 'holdout', 0.1);
         idxs = cv.test;
-        TestData = Data(idxs,:);
-        TrainData = Data(~idxs,:);
+        test = Data(idxs,:);
+        train = Data(~idxs,:);
 
-        data = HybridSampling(TrainData);
-        ortest = TestData;
-        batest = HybridSampling(TestData);
+        data = HybridSampling(train);
+        orriginal_test = test;
+        balanced_test = HybridSampling(test);
 
         %% Model SETTINGS
         params.classifiers = {'KNN', 'DT', 'DISCR', 'NB', 'ANN'};
@@ -54,29 +55,17 @@ for l=1:numRun
         % Test results of nature-inspired optimization
         sf = ACO.sf;
         data = [data(:,sf), data(:,end)];       
-        ortest = [ortest(:,sf),ortest(:,end)];
-        batest = [batest(:,sf),batest(:,end)];
+        orriginal_test = [orriginal_test(:,sf),orriginal_test(:,end)];
+        balanced_test = [balanced_test(:,sf),balanced_test(:,end)];
 
-%         testdata = [testdata(:,sf),testdata(:,end)];     
-    
-%         fstrain = [data(:,sf), data(:,end)];
-%         fsortest = [testdata(:,sf),testdata(:,end)];
-%         fsbatest = [balancedtest(:,sf),balancedtest(:,end)];
-%         save("norfstrain.mat","fstrain");
-%         save("norfsortest.mat","fsortest");
-%         save("norfsbatest.mat","fsbatest");
-    
-    %     test = [test(:,sf),test(:,end)];  
-    
-    
-%         batest = fsbatest;
+
         fs_model = trainNN(data(:,1:end-1), data(:,end)); % ANN
-        pred  = getNNPredict(fs_model,batest(:,1:end-1));
-        results.fs_test_acc = metric_accuracy(batest(:,end), pred);
-        results.fs_test_auc = metric_auroc(batest(:,end), pred);
-        results.fs_test_auprc = metric_auprc(batest(:,end), pred);
-        results.fs_test_fscore = metric_fscore(batest(:,end), pred);
-        results.fs_test_gmean = metric_gmean(batest(:,end), pred);
+        pred  = getNNPredict(fs_model,balanced_test(:,1:end-1));
+        results.fs_test_acc = metric_accuracy(balanced_test(:,end), pred);
+        results.fs_test_auc = metric_auroc(balanced_test(:,end), pred);
+        results.fs_test_auprc = metric_auprc(balanced_test(:,end), pred);
+        results.fs_test_fscore = metric_fscore(balanced_test(:,end), pred);
+        results.fs_test_gmean = metric_gmean(balanced_test(:,end), pred);
 
         tdata = data;
 %         tdata = normalize(tdata,"range");
@@ -84,7 +73,7 @@ for l=1:numRun
         finalClassifiers = [];
         cvs = cvpartition(tdata(:,end), 'KFold', 5);
         for f = 1 : 5
-            idxs = cvs.test(f);
+            idxs = cvs.test(f); 
             testData = tdata(idxs,:);
             trainData = tdata(~idxs, :);
             
@@ -102,12 +91,8 @@ for l=1:numRun
     
             validation = [valX,valy];
     
-%             X = trainX;
-%             y = trainy;
             allClusters = generateClustersV2([trainX, trainy]);
             [allClusters, centroids] = balanceClusters(allClusters, [trainX trainy]);
-%             allClusters = generateClustersV2(trainData);
-%             [allClusters, centroids] = balanceClusters(allClusters, trainData);
             for i = 1 : length(allClusters)
                 balancedClusters{i} = allClusters{i};
             end
@@ -148,41 +133,55 @@ for l=1:numRun
     %         classifiers = classifiers(ACO.sc);
             finalClassifiers = [finalClassifiers, classifiers(ACO.sc)];
 %             [auc1, pred, Xfpr,Ytpr,testAcc(f),testAUC(f),testAUPRC(f),testfscore(f), testgmean(f)] = fusion(classifiers(ACO.sc), batest);  
-            [~, ~, ~,~,testAcc1(f),testAUC1(f),testAUPRC1(f),testfscore1(f), testgmean1(f)] = fusion(classifiers, batest); 
-            [~,~,~,~,testAcc2(f),testAUC2(f),testAUPRC2(f),testfscore2(f),testgmean2(f)] = fusion(classifiers(ACO.sc), ortest);
+            [~,~,~,~,testAcc1(f),testAUC1(f),testAUPRC1(f),testfscore1(f),testgmean1(f)] = fusion(classifiers, balanced_test); 
+            [~,~,~,~,testAcc2(f),testAUC2(f),testAUPRC2(f),testfscore2(f),testgmean2(f)] = fusion(classifiers, orriginal_test);
+            [~,~,~,~,testAcc3(f),testAUC3(f),testAUPRC3(f),testfscore3(f),testgmean3(f)] = fusion(classifiers(ACO.sc), balanced_test);
+            [~,~,~,~,testAcc4(f),testAUC4(f),testAUPRC4(f),testfscore4(f),testgmean4(f)] = fusion(classifiers(ACO.sc), orriginal_test);
         end
         % save('finalClassifiers.mat','finalClassifiers');
-        [auc1, pred, Xfpr,Ytpr,testAcc,testAUC,testAUPRC,testfscore, testgmean] = fusion(finalClassifiers, batest); 
-        [auc3, pred3, Xfpr3,Ytpr3,testAcc3,testAUC3,testAUPRC3,testfscore3, testgmean3] = fusion(finalClassifiers, ortest); 
-    %   % Optimization
-        results.op_training_acc = mean(testAcc3);
-        results.op_training_auc = mean(testAUC3);
-        results.op_training_auprc = mean(testAUPRC3);
-        results.op_training_fscore = mean(testfscore3);
-        results.op_training_gmean = mean(testgmean3);
-        % Unoptimization
-        results.unop_training_acc = mean(testAcc2);
-        results.unop_training_auc = mean(testAUC2);
-        results.unop_training_auprc = mean(testAUPRC2);
-        results.unop_training_fscore = mean(testfscore2);
-        results.unop_training_gmean = mean(testgmean2);
-        % Test results after optimization of ensemble
-            
-        results.op_test_acc = mean(testAcc);
-        results.op_test_auc = mean(testAUC);
-        results.op_test_auprc = mean(testAUPRC);
-        results.op_test_fscore = mean(testfscore);
-        results.op_test_gmean = mean(testgmean);
-        fprintf('\n Without optimization: test acc = %f, test auc = %f, test auprc = %f, test f1score = %f, test gmean = %f',mean(testAcc1), mean(testAUC1),mean(testAUPRC1), mean(testfscore1), mean(testgmean));
-        fprintf('\n Optimization for testdata: test acc = %f, test auc = %f, test auprc = %f, test f1score = %f, test gmean = %f',mean(testAcc2), mean(testAUC2),mean(testAUPRC2), mean(testfscore2), mean(testgmean2));
+        [~,~,~,~,testAcc5,testAUC5,testAUPRC5,testfscore5, testgmean5] = fusion(finalClassifiers, balanced_test); 
+        
+        %% Unoptimization
+        % Balanced 
+        results.unop_batest_acc = mean(testAcc1);
+        results.unop_batest_auc = mean(testAUC1);
+        results.unop_batest_auprc = mean(testAUPRC1);
+        results.unop_batest_fscore = mean(testfscore1);
+        results.unop_batest_gmean = mean(testgmean1);
+        
+        % Original 
+        results.unop_ortest_acc = mean(testAcc2);
+        results.unop_ortest_auc = mean(testAUC2);
+        results.unop_ortest_auprc = mean(testAUPRC2);
+        results.unop_ortest_fscore = mean(testfscore2);
+        results.unop_ortest_gmean = mean(testgmean2);
 
-        results.fs_training_acc = results.fs_test_gmean;
-        results.fs_training_auc = results.op_training_gmean;
-        results.fs_training_auprc = results.unop_training_gmean;
-        results.fs_training_fscore = results.op_test_gmean;
+        %% Optimization
+        % Balanced 
+        results.op_batest_acc = mean(testAcc3);
+        results.op_batest_auc = mean(testAUC3);
+        results.op_batest_auprc = mean(testAUPRC3);
+        results.op_batest_fscore = mean(testfscore3);
+        results.op_batest_gmean = mean(testgmean3);
+
+        % Original 
+        results.op_ortest_acc = mean(testAcc4);
+        results.op_ortest_auc = mean(testAUC4);
+        results.op_ortest_auprc = mean(testAUPRC4);
+        results.op_ortest_fscore = mean(testfscore4);
+        results.op_ortest_gmean = mean(testgmean4);
+
+        % Balanced ensemble
+        results.be_op_test_acc = mean(testAcc5);
+        results.be_op_test_auc = mean(testAUC5);
+        results.be_op_test_auprc = mean(testAUPRC5);
+        results.be_op_test_fscore = mean(testfscore5);
+        results.be_op_test_gmean = mean(testgmean5);
+
         saveResults(results);
     end
 end
+
 
 
 
