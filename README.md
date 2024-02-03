@@ -5,7 +5,6 @@ Code for “Evolving Pathway Activation from Cancer Gene Expression Data using N
 ![model](https://github.com/wangxb96/HSNOE/blob/main/figures/model.png)
 
 ## Folders
-- **baselines**: The baselines used for comparison.
 - **code**: The codes designed by this study.
 - **data**: The data for the experiment.
 
