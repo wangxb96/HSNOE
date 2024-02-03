@@ -1,5 +1,14 @@
 function data = HybridSampling(data)
 %%  Undersampling using NCL 
+    [size1 size2]=size(data);
+    Group = data(:,size2);
+    adrN = find(Group==0);
+    adrP = find(Group==1);
+    SampleN = data(adrN,:); % Negative Training Data
+    SampleP = data(adrP,:); % Positive Training Data
+    size1N=size(SampleN,1);
+    size1P=size(SampleP,1);
+    IR = floor(size1N / size1P);
     DeleteAddress = NCL(data);  % training set
     Undersampled = data;
     if DeleteAddress ~= 0
@@ -8,7 +17,7 @@ function data = HybridSampling(data)
     data = Undersampled; % after undersampling   
     [size1, size2] = size(data);
     T = sum(data(:,size2)); 
-    Synthesis  = SMOTE(data,T,100,5); % SMOTE oversampling
+    Synthesis  = SMOTE(data,T,100 * IR,5); % SMOTE oversampling
     data = [data; Synthesis];    
     DeleteAddress = NCL(data);  % training set
     Undersampled = data;
@@ -16,20 +25,4 @@ function data = HybridSampling(data)
         Undersampled(DeleteAddress,:) = [];
     end
     data = Undersampled; % after undersampling  
-    % train = data;
-    % save('test100.mat','train');
-
-    %     X = data(:,1:end-1);
-    %     Y = data(:, end);
-    %     cv = cvpartition(Y,'holdout',0.1);
-    %     indx = cv.test;
-    %     Xtrain = X(~indx,:);
-    %     Ytrain = Y(~indx);
-    %     Xtest = X(indx,:);
-    %     Ytest = Y(indx);   
-    
-    %     train = [Xtrain,Ytrain]; %For Training
-    %     save('train100.mat','train');
-    %     test = [Xtest,Ytest]; %For Test
-    %     save('test100.mat','test');
 end
