@@ -2,7 +2,7 @@ clear, clc, close;
 numRun = 10;
 for l=1:numRun
 
-   Problem = {'ecoli'};
+   Problem = {'ecoli', 'sick_euthyroid', 'yeast_ml8', 'arrhythmia', 'yeast_me2'}; 
 
     %% MAIN LOOP
     for j = 1:length(Problem)
@@ -10,21 +10,8 @@ for l=1:numRun
         results.p_name = p_name;                           
         warning('off','all');
         %% load data
-        traindata = load(['C:\Users\wangxb\Desktop\HSNOE\data\,p_name]);
-
-        Data = traindata.data;
-        feat = Data(:,1:end-1); 
-        label = Data(:,end);
-        index = find(label == -1);
-        label(index) = 0;
-
-        Data = [feat, label];
-
-        % Data =data;
-        cv = cvpartition(Data(:,end), 'holdout', 0.1);
-        idxs = cv.test;
-        test = Data(idxs,:);
-        train = Data(~idxs,:);
+        load(['C:\Users\wangxb\Desktop\HSNOE\data\train\',p_name]);
+        load(['C:\Users\wangxb\Desktop\HSNOE\data\test\',p_name]);
 
         data = HybridSampling(train);
         orriginal_test = test;
@@ -132,7 +119,6 @@ for l=1:numRun
             fprintf('\n training auc = %f, unoptimized training auc = %f, auc2 = %f, auprc = %f, fscore = %f, gmean = %f',mean(auc01), mean(auc02), mean(AUC2), mean(AUPRC2), mean(fscore2), mean(gmean2));
     %         classifiers = classifiers(ACO.sc);
             finalClassifiers = [finalClassifiers, classifiers(ACO.sc)];
-%             [auc1, pred, Xfpr,Ytpr,testAcc(f),testAUC(f),testAUPRC(f),testfscore(f), testgmean(f)] = fusion(classifiers(ACO.sc), batest);  
             [~,~,~,~,testAcc1(f),testAUC1(f),testAUPRC1(f),testfscore1(f),testgmean1(f)] = fusion(classifiers, balanced_test); 
             [~,~,~,~,testAcc2(f),testAUC2(f),testAUPRC2(f),testfscore2(f),testgmean2(f)] = fusion(classifiers, orriginal_test);
             [~,~,~,~,testAcc3(f),testAUC3(f),testAUPRC3(f),testfscore3(f),testgmean3(f)] = fusion(classifiers(ACO.sc), balanced_test);
@@ -179,6 +165,9 @@ for l=1:numRun
         results.be_op_test_gmean = mean(testgmean5);
 
         saveResults(results);
+
+        average = (mean(testAcc5) + mean(testAUC5) + mean(testAUPRC5) + mean(testfscore5) + mean(testgmean5)) / 5;
+        fprintf('\n test acc = %f, auc = %f, auprc = %f, fscore = %f, gmean = %f, average = %f', mean(testAcc5), mean(testAUC5), mean(testAUPRC5), mean(testfscore5), mean(testgmean5), average);
     end
 end
 
