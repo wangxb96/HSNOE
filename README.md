@@ -1,12 +1,12 @@
 <div align="center">
 <h1>Evolving Pathway Activation from Cancer Gene Expression Data using Nature-inspired Ensemble Optimization</h1>
 
-[**Xubin Wang**](https://github.com/wangxb96)<sup>12</sup> · **Yunhe Wang**<sup>1*</sup> · **Zhiqing Ma**<sup>3</sup> · **Ka-Chun Wong**<sup>4</sup> · **Xiangtao Li**<sup>2*</sup>
+[**Xubin Wang**](https://github.com/wangxb96)<sup>12</sup> · **Yunhe Wang**<sup>1*</sup> · **Zhiqing Ma**<sup>3</sup> · **Ka-Chun Wong**<sup>4</sup> · **Xiangtao Li**<sup>2</sup>
 
 
 <sup>1</sup>Hebei University of Technology · <sup>2</sup>Jilin University · <sup>3</sup>Northeast Normal University · <sup>4</sup>City University of Hong Kong
 
-<sup>*</sup>corresponding authors
+<sup>*</sup>corresponding author
 
 [**Code**](https://github.com/wangxb96/HSNOE)
 
@@ -57,5 +57,18 @@ The framework of the proposed HSNOE model. It consists of four main phases: In P
  - jknn.m
  ### 9. Save Results
  - saveResults.m
+
+## Citation
+```
+@article{wang2024evolving,
+  title={Evolving pathway activation from cancer gene expression data using nature-inspired ensemble optimization},
+  author={Wang, Xubin and Wang, Yunhe and Ma, Zhiqiang and Wong, Ka-Chun and Li, Xiangtao},
+  journal={Expert Systems with Applications},
+  pages={123469},
+  year={2024},
+  publisher={Elsevier}
+}
+```
+
 ## Contact
 wangxb19 at mails.jlu.edu.cn
