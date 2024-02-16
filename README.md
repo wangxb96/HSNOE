@@ -8,7 +8,7 @@
 
 <sup>*</sup>corresponding author
 
-[**Code**](https://github.com/wangxb96/HSNOE)
+[**PDF**](https://www.wangxubin.site/Paper/HSNOE_ESWA24.pdf) · [**Code**](https://github.com/wangxb96/HSNOE)
 
 </div>
 
